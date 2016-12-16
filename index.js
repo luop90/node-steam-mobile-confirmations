@@ -152,15 +152,21 @@ class SteamCommunityMobileConfirmations {
   _sendMultiConfirmationAjax(confirmations, operation, callback) {
     let url = `${this.STEAM_BASE}/mobileconf/multiajaxop`;
     let queryVariables = this._generateQueryVariables(operation);
+
+    // Initialize our form
     let form = {
       op: operation,
       cid: [],
       ck: []
     };
 
+    // Move our query variables to the new form
+    _.extend(form, queryVariables);
 
+    // Loop over each confirmation, adding each id / key to their respective array
     for (let confirmation of confirmations) {
-      url += `&cid[]=${confirmation.id}&ck[]=${confirmation.key}`;
+      form.cid.push(confirmation.id);
+      form.ck.push(confirmation.key);
     }
 
     this.request(url, 'POST', form, (err, response, body) => {
