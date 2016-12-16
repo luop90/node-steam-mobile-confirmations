@@ -149,7 +149,7 @@ class SteamCommunityMobileConfirmations {
     });
   }
 
-  _sendMultiConfirmationAjax(confirmations, operation, callback) {
+  _sendMultiConfirmationResponse(confirmations, operation, callback) {
     let url = `${this.STEAM_BASE}/mobileconf/multiajaxop`;
     let queryVariables = this._generateQueryVariables(operation);
 
