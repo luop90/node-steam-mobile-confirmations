@@ -4,6 +4,7 @@ const fs = require('fs');
 const request = require('request');
 const Cheerio = require('cheerio');
 const SteamTotp = require('steam-totp');
+const _ = require('underscore');
 
 const Confirmation = require('/lib/Confirmation.js');
 
