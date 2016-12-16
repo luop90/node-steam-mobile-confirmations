@@ -1,9 +1,14 @@
 {
   "name": "steam-mobile-confirmations",
   "description": "An updated trade-confirmation module for node-steam",
+  "version": "1.0.0",
   "author": "Luop90",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/luop90/node-steam-mobile-confirmations"
+  },
   "license": "MIT",
   "dependencies": {
-    
+
   }
 }
