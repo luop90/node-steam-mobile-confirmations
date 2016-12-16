@@ -188,7 +188,7 @@ class SteamCommunityMobileConfirmations {
    * @return {void}
    */
   _getConfirmationDetails(confirmation, callback) {
-    let url = `https://steamcommunity.com/mobileconf/details/${confirmation.id}?${this._generateQueryString('details')}`;
+    let url = `${this.STEAM_BASE}/mobileconf/details/${confirmation.id}?${this._generateQueryString('details')}`;
 
     this.request(url, 'GET', (err, response, body) => {
       let error = checkResponse(err, response, body);
