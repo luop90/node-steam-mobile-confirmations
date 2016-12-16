@@ -84,7 +84,7 @@ class SteamCommunityMobileConfirmations {
 
       });
     } else {
-      this._sendMultiConfirmationAjax(confirmation, 'allow', (error, result) => {
+      this._sendMultiConfirmationResponse(confirmation, 'allow', (error, result) => {
 
       });
     }
