@@ -1,0 +1,9 @@
+{
+  "name": "steam-mobile-confirmations",
+  "description": "An updated trade-confirmation module for node-steam",
+  "author": "Luop90",
+  "license": "MIT",
+  "dependencies": {
+    
+  }
+}
