@@ -9,6 +9,9 @@
   },
   "license": "MIT",
   "dependencies": {
-
+    "cheerio": "^0.22.0",
+    "request": "^2.79.0",
+    "steam-totp": "^1.4.0",
+    "underscore": "^1.8.3"
   }
 }
