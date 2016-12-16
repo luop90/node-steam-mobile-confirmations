@@ -149,6 +149,13 @@ class SteamCommunityMobileConfirmations {
     });
   }
 
+  /**
+   * Allows multiple confirmations to be sent at once (either all accept, or all deny)
+   * @param  {Array}    confirmations The confirmation array
+   * @param  {String}   operation     accept / deny
+   * @param  {Function} callback
+   * @return {void}
+   */
   _sendMultiConfirmationResponse(confirmations, operation, callback) {
     let url = `${this.STEAM_BASE}/mobileconf/multiajaxop`;
     let queryVariables = this._generateQueryVariables(operation);
@@ -177,7 +184,12 @@ class SteamCommunityMobileConfirmations {
         return;
       }
 
-
+      try {
+        let result = JSON.parse(body);
+        callback(null, result.success);
+      } catch (e) {
+        callback(e, null);
+      }
     });
   }
 
