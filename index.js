@@ -220,6 +220,11 @@ class SteamCommunityMobileConfirmations {
     return queryString;
   }
 
+  /**
+   * Actually generate the needed variables
+   * @param  {String} tag Action tag
+   * @return {Object}     The variables, zipped together a nice & neat object!
+   */
   _generateQueryVariables(tag) {
     let time = Math.floor(Date.now() / 1000) + this.steamOffset;
 
