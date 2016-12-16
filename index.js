@@ -102,7 +102,7 @@ class SteamCommunityMobileConfirmations {
    * @param  {Function} callback
    * @return {void}
    */
-  function request(url, method, form, callback) {
+  request(url, method, form, callback) {
     if (typeof form === 'function') {
       callback = form;
       form = {};
