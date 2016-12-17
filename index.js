@@ -5,6 +5,7 @@ const request = require('request');
 const Cheerio = require('cheerio');
 const SteamTotp = require('steam-totp');
 const _ = require('underscore');
+const events = require('events');
 
 const Confirmation = require('/lib/Confirmation.js');
 
@@ -15,6 +16,8 @@ class SteamCommunityMobileConfirmations {
   this.deviceId = '';
   this.offest = 0;
   this.has429Error = false;
+  this.needsNewSession = true;
+  this.errorEvent = new events.EventEmitter;
   this.timeBetweenCalls = 0;
   this._requestJar = request.jar();
   this._request = request.defaults({ jar: this._requestJar });
@@ -41,6 +44,8 @@ class SteamCommunityMobileConfirmations {
     for (let cookie of data.webCookie) {
       this._requestJar.setCookie(request.cookie(cookie), this.STEAM_BASE);
     }
+
+    this.needsNewSession = false;
   }
 
   /**
@@ -157,6 +162,15 @@ class SteamCommunityMobileConfirmations {
    * @return {void}
    */
   request(url, method, form, callback) {
+    if (this.needsNewSession) {
+      console.error('Waiting for new session before calling request!');
+
+      setTimeout(() => {
+        this.request(url, method, form, callback);
+      }, timeBetweenCalls);
+      return;
+    }
+
     if (typeof form === 'function') {
       callback = form;
       form = {};
@@ -173,7 +187,33 @@ class SteamCommunityMobileConfirmations {
       url: url,
       headers: headers,
       form: form
-    }, callback);
+    }, handleRequestCallback);
+
+    let handleRequestCallback = (error, body, response) => {
+      // If we have a 429 error, because volvo fucking hates us, wait for 3x the normal wait, and then try again.
+      if (response.statusCode == 429) {
+        this.has429Error = true;
+
+        setTimeout(() => {
+          this.request(url, method, form, callback);
+        }, timeBetweenCalls * 3);
+        return;
+      } else if (error || response.statusCode != 200) {
+        console.error(error);
+        console.error(response.statusCode);
+        console.error(body);
+
+        this.needsNewSession = true;
+        this.errorEvent.emit('needsNewSession');
+
+        setTimeout(() => {
+          this.request(url, method, form, callback);
+        }, timeBetweenCalls);
+        return;
+      }
+
+      callback(error, body, response);
+    };
   }
 
   /**
