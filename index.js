@@ -90,9 +90,10 @@ class SteamCommunityMobileConfirmations {
    * Sends the response to accept the confirmation
    * @param  {Confirmation} confirmation The Confirmation we are responding too (or Confirmation[])
    * @param  {Function}     callback
+   * @param {boolean}       secondTry Whether or not we try to accept again. undefined for false
    * @return {void}
    */
-  acceptConfirmation(confirmation, callback) {
+  acceptConfirmation(confirmation, callback, secondTry) {
     if (confirmation instanceof Array) {
       this._sendMultiConfirmationResponse(confirmation, 'allow', handleConfirmationResponse);
     } else {
@@ -101,10 +102,15 @@ class SteamCommunityMobileConfirmations {
 
     let handleConfirmationResponse = (error, result) => {
       if (error || !result.success) {
-        setTimeout(() => {
-          this.acceptConfirmation(confirmation, callback);
-        }, timeBetweenCalls);
+        if (secondTry == undefined) {
+          setTimeout(() => {
+            this.acceptConfirmation(confirmation, callback, true);
+          }, timeBetweenCalls);
 
+          return;
+        }
+
+        callback(false);
         return;
       }
 
@@ -181,7 +187,7 @@ class SteamCommunityMobileConfirmations {
           this.request(url, method, form, callback);
         }, timeBetweenCalls * 3);
         return;
-      } else if (error || response.statusCode != 200) {
+      } else if (error || error.message == 'Invalid protocol: steammobile:') {
         console.error(error);
         console.error(response.statusCode);
         console.error(body);
