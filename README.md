@@ -48,5 +48,10 @@ This method updates the current session / cookies currently in use. Run this aft
 
 `webCookie` can be obtained using [node-steam](https://github.com/seishun/node-steam) and its plugin [steam-weblogon](https://github.com/Alex7Kom/node-steam-weblogon)
 
+### fetchConfirmations(callback)
+Returns all currently outstanding (active) confirmations.
+
+The second argument to `callback` will be an array of [Confirmation](https://github.com/luop90/node-steam-mobile-confirmations/wiki/CConfirmation) objects.
+
 ## License
 MIT
