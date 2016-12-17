@@ -135,9 +135,7 @@ class SteamCommunityMobileConfirmations {
 
       let tradeId = $('div.tradeoffer').attr('id').match(/\d+/i);
 
-      confirmation.tradeId = tradeId;
-
-      callback(null, confirmation);
+      callback(null, tradeId);
     });
   }
 
