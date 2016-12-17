@@ -55,5 +55,17 @@ Returns all currently outstanding (active) confirmations.
 
 The second argument to `callback` will be an array of [Confirmation](https://github.com/luop90/node-steam-mobile-confirmations/wiki/CConfirmation) objects.
 
+### acceptConfirmation(confirmation, callback)
+This accepts a confirmation (or array of confirmations) from the fetchConfirmations() call. If an error occurs while accepting, it tries once more before erroring.
+
+The second argument to `callback` will be a success boolean. (True for confirmed, false for error.)
+
+### getConfirmationTradeId(confirmation, callback)
+**You will likely not need to use this**, since the trade offer ID is already included in the [Confirmation](https://github.com/luop90/node-steam-mobile-confirmations/wiki/CConfirmation) object.
+
+  This will only fetch the confirmation information again, and then return the trade offer ID.
+
+  The second argument to `callback` will be the tradeId, fetched from Valve.
+
 ## License
 MIT
