@@ -22,7 +22,7 @@ var SteamMobileConfirmations = require('steam-mobile-confirmations');
 var steamConfirmations = new SteamMobileConfirmations({
   steamId: steamId64,
   identitySecret: identitySecret
-  });
+});
 ```
 
 Obtain session information with [node-steam](https://github.com/seishun/node-steam) and its plugin [steam-weblogon](https://github.com/Alex7Kom/node-steam-weblogon)
@@ -31,7 +31,7 @@ Obtain session information with [node-steam](https://github.com/seishun/node-ste
 Coming soon.
 
 ## Methods
-`options` param of all methods is an object. All callbacks are supplied with `Error` as the first argument, or `null` of no errors occurred.
+The `options` param of all methods is an object. All callbacks are supplied with `Error` as the first argument, or `null` if no errors occurred.
 
 ## constructor(options)
 This sets up all final values, and should only be called **once**.
