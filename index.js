@@ -92,13 +92,21 @@ class SteamCommunityMobileConfirmations {
    */
   acceptConfirmation(confirmation, callback) {
     if (!Array.isArray(confirmation)) {
-      this._sendConfirmationResponse(confirmation, 'allow', (error, result) => {
-
-      });
+      this._sendConfirmationResponse(confirmation, 'allow', handleConfirmationResponse);
     } else {
-      this._sendMultiConfirmationResponse(confirmation, 'allow', (error, result) => {
+      this._sendMultiConfirmationResponse(confirmation, 'allow', handleConfirmationResponse);
+    }
 
-      });
+    let handleConfirmationResponse = (error, result) => {
+      if (error || !result.success) {
+        setTimeout(() => {
+          this.acceptConfirmation(confirmation, callback);
+        }, timeBetweenCalls);
+
+        return;
+      }
+
+      callback(true);
     }
   }
 
