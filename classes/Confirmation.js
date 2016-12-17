@@ -12,3 +12,5 @@ class Confirmation {
     this.tradeId = data.tradeId;
   }
 }
+
+module.exports = Confirmation;
