@@ -74,7 +74,7 @@ class SteamCommunityMobileConfirmations {
 
   /**
    * Sends the response to accept the confirmation
-   * @param  {Confirmation} confirmation The Confirmation we are responding too
+   * @param  {Confirmation} confirmation The Confirmation we are responding too (or an array of confirmations)
    * @param  {Function}     callback
    * @return {void}
    */
@@ -90,8 +90,26 @@ class SteamCommunityMobileConfirmations {
     }
   }
 
+  /**
+   * This retrieves the tradeId from a confirmation
+   * @param  {Confirmation}   confirmation The specific confirmation
+   * @param  {Function}       callback
+   * @return {void}
+   */
   getConfirmationTradeId(confirmation, callback) {
+    this._getConfirmationDetails(confirmation, (error, body) => {
+      if (error) {
+        callback(error, null);
+        return;
+      }
 
+      let $ = Cheerio.load(body);
+      fs.writeFileSync(`output-details.html`, body);
+
+      let tradeId = $('div.tradeoffer').attr('id').match(/\d+/i);
+
+      callback(null, tradeId);
+    });
   }
 
   /**
@@ -210,12 +228,7 @@ class SteamCommunityMobileConfirmations {
         return;
       }
 
-      try {
-        let result = JSON.parse(body);
-        callback(null, result, confirmation);
-      } catch (e) {
-        callback(e, null);
-      }
+      callback(null, body);
     });
   }
 
