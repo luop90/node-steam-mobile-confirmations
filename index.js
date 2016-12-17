@@ -33,6 +33,17 @@ class SteamCommunityMobileConfirmations {
   }
 
   /**
+   * Updates the cookies if the session expired
+   * @param  {Object} webCookie The new set of cookies
+   * @return {void}
+   */
+  updateCookies(webCookie) {
+    for (let cookie of data.webCookie) {
+      this._requestJar.setCookie(request.cookie(cookie), this.STEAM_BASE);
+    }
+  }
+
+  /**
    * Grabs all confirmations
    * @param {Function} callback The function callback'd.
    * @return {void}
