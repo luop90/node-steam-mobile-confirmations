@@ -50,6 +50,7 @@ class SteamCommunityMobileConfirmations {
 
       // Parse our confirmations
       let confirmations = [];
+      let finalConfirmations = [];
       let $ = Cheerio.load(body);
       fs.writeFileSync(`output.html`, body);
 
@@ -64,11 +65,22 @@ class SteamCommunityMobileConfirmations {
           key: $confirmation.data('key'),
           description: description,
           cancel: $confirmation.data('cancel'),
-          accept: $confirmation.data('accept')
+          accept: $confirmation.data('accept'),
+          tradeId: null
         }));
       });
 
-      callback(null, confirmations);
+      for (let confirmation of confirmations) {
+        this.getConfirmationTradeId(confirmation, (error, updatedConfirmation) => {
+          finalConfirmations.push(updatedConfirmation);
+
+          // If we've finalized each confirmation, callback()
+          if (finalConfirmations.length == confirmations.length) {
+            callback(null, finalConfirmations);
+            return;
+          }
+        });
+      }
     });
   }
 
@@ -99,7 +111,7 @@ class SteamCommunityMobileConfirmations {
   getConfirmationTradeId(confirmation, callback) {
     this._getConfirmationDetails(confirmation, (error, body) => {
       if (error) {
-        callback(error, null);
+        callback(error, confirmation);
         return;
       }
 
@@ -108,7 +120,9 @@ class SteamCommunityMobileConfirmations {
 
       let tradeId = $('div.tradeoffer').attr('id').match(/\d+/i);
 
-      callback(null, tradeId);
+      confirmation.tradeId = tradeId;
+
+      callback(null, confirmation);
     });
   }
 
