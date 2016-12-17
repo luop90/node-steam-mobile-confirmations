@@ -73,33 +73,16 @@ class SteamCommunityMobileConfirmations {
       // Go through each confirmation, and generate a new Confirmation object
       $('[data-confid]').each((index, element) => {
         let $confirmation = $(element);
-        let description = $confirmation.find('.mobileconf_list_entry_description > div').map(function () {
-          return $(this).text();
-        });
-
-        console.log(description);
 
         confirmations.push(new Confirmation({
           id: $confirmation.data('confid'),
+          type: $confirmation.data('type'),
           key: $confirmation.data('key'),
-          description: description,
-          cancel: $confirmation.data('cancel'),
-          accept: $confirmation.data('accept'),
-          tradeId: null
+          tradeId: $confirmation.data('creator')
         }));
       });
 
-      for (let confirmation of confirmations) {
-        this.getConfirmationTradeId(confirmation, (error, updatedConfirmation) => {
-          finalConfirmations.push(updatedConfirmation);
-
-          // If we've finalized each confirmation, callback()
-          if (finalConfirmations.length == confirmations.length) {
-            callback(null, finalConfirmations);
-            return;
-          }
-        });
-      }
+      callback(null, confirmations);
     });
   }
 
