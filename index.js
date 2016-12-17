@@ -7,27 +7,24 @@ const SteamTotp = require('steam-totp');
 const _ = require('underscore');
 const events = require('events');
 
-const Confirmation = require('/lib/Confirmation.js');
+const Confirmation = require('./classes/Confirmation.js');
 
 class SteamCommunityMobileConfirmations {
-  this.STEAM_BASE = 'https://steamcommunity.com'
-  this.steamId = '';
-  this.identitySecret = '';
-  this.deviceId = '';
-  this.offest = 0;
-  this.has429Error = false;
-  this.needsNewSession = true;
-  this.errorEvent = new events.EventEmitter;
-  this.timeBetweenCalls = 0;
-  this._requestJar = request.jar();
-  this._request = request.defaults({ jar: this._requestJar });
-
   constructor(data) {
+    // Initialize values from the data object
     this.steamId = data.steamId;
     this.identitySecret = data.identitySecret;
     this.deviceId = data.deviceId || SteamTotp.getDeviceID(this.steamId);
     this.offset = data.steamOffset || 0;
     this.timeBetweenCalls = data.waitTime || 10000;
+
+    // Initialize all others
+    this.STEAM_BASE = 'https://steamcommunity.com'
+    this.has429Error = false;
+    this.needsNewSession = false;
+    this.errorEvent = new events.EventEmitter;
+    this._requestJar = request.jar();
+    this._request = request.defaults({ jar: this._requestJar });
 
     // Set each cookie NOM NOM
     for (let cookie of data.webCookie) {
@@ -94,27 +91,29 @@ class SteamCommunityMobileConfirmations {
    * @return {void}
    */
   acceptConfirmation(confirmation, callback, secondTry) {
-    if (confirmation instanceof Array) {
-      this._sendMultiConfirmationResponse(confirmation, 'allow', handleConfirmationResponse);
-    } else {
-      this._sendConfirmationResponse(confirmation, 'allow', handleConfirmationResponse);
-    }
-
-    let handleConfirmationResponse = (error, result) => {
+    var handleConfirmationResponse = (error, result) => {
       if (error || !result.success) {
+        console.log('Failed to accept first time: ' + error || result);
+
         if (secondTry == undefined) {
           setTimeout(() => {
             this.acceptConfirmation(confirmation, callback, true);
-          }, timeBetweenCalls);
+          }, this.timeBetweenCalls);
 
           return;
         }
 
-        callback(false);
+        callback(error, false);
         return;
       }
 
-      callback(true);
+      callback(null, true);
+    };
+
+    if (Array.isArray(confirmation)) {
+      this._sendMultiConfirmationResponse(confirmation, 'allow', handleConfirmationResponse);
+    } else {
+      this._sendConfirmationResponse(confirmation, 'allow', handleConfirmationResponse);
     }
   }
 
@@ -156,7 +155,7 @@ class SteamCommunityMobileConfirmations {
 
       setTimeout(() => {
         this.request(url, method, form, callback);
-      }, timeBetweenCalls);
+      }, this.timeBetweenCalls);
       return;
     }
 
@@ -176,18 +175,16 @@ class SteamCommunityMobileConfirmations {
       url: url,
       headers: headers,
       form: form
-    }, handleRequestCallback);
-
-    let handleRequestCallback = (error, body, response) => {
+    }, (error, response, body) => {
       // If we have a 429 error, because volvo fucking hates us, wait for 3x the normal wait, and then try again.
       if (response.statusCode == 429) {
         this.has429Error = true;
 
         setTimeout(() => {
           this.request(url, method, form, callback);
-        }, timeBetweenCalls * 3);
+        }, this.timeBetweenCalls * 3);
         return;
-      } else if (error || error.message == 'Invalid protocol: steammobile:') {
+      } else if (error && error.message == 'Invalid protocol: steammobile:') {
         console.error(error);
         console.error(response.statusCode);
         console.error(body);
@@ -197,12 +194,12 @@ class SteamCommunityMobileConfirmations {
 
         setTimeout(() => {
           this.request(url, method, form, callback);
-        }, timeBetweenCalls);
+        }, this.timeBetweenCalls);
         return;
       }
 
-      callback(error, body, response);
-    };
+      callback(error, response, body);
+    });
   }
 
   /**
@@ -225,9 +222,9 @@ class SteamCommunityMobileConfirmations {
 
       try {
         let result = JSON.parse(body);
-        callback(null, result.success);
+        callback(null, result);
       } catch (e) {
-        callback(e, null);
+        callback(new Error('Failed to parse body'), null);
       }
     });
   }
@@ -269,9 +266,9 @@ class SteamCommunityMobileConfirmations {
 
       try {
         let result = JSON.parse(body);
-        callback(null, result.success);
+        callback(null, result);
       } catch (e) {
-        callback(e, null);
+        callback(new Error('Failed to parse body'), null);
       }
     });
   }
@@ -323,7 +320,7 @@ class SteamCommunityMobileConfirmations {
    * @return {Object}     The variables, zipped together a nice & neat object!
    */
   _generateQueryVariables(tag) {
-    let time = Math.floor(Date.now() / 1000) + this.steamOffset;
+    let time = SteamTotp.time(this.steamOffset);
 
     let result = {
       p: this.deviceId,
