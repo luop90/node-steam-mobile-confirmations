@@ -88,15 +88,15 @@ class SteamCommunityMobileConfirmations {
 
   /**
    * Sends the response to accept the confirmation
-   * @param  {Confirmation} confirmation The Confirmation we are responding too (or an array of confirmations)
+   * @param  {Confirmation} confirmation The Confirmation we are responding too (or Confirmation[])
    * @param  {Function}     callback
    * @return {void}
    */
   acceptConfirmation(confirmation, callback) {
-    if (!Array.isArray(confirmation)) {
-      this._sendConfirmationResponse(confirmation, 'allow', handleConfirmationResponse);
-    } else {
+    if (confirmation instanceof Array) {
       this._sendMultiConfirmationResponse(confirmation, 'allow', handleConfirmationResponse);
+    } else {
+      this._sendConfirmationResponse(confirmation, 'allow', handleConfirmationResponse);
     }
 
     let handleConfirmationResponse = (error, result) => {
