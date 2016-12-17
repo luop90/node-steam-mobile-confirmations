@@ -9,7 +9,7 @@ const _ = require('underscore');
 const Confirmation = require('/lib/Confirmation.js');
 
 class SteamCommunityMobileConfirmations {
-  this.STEAM_BASE = 'http://steamcommunity.com'
+  this.STEAM_BASE = 'https://steamcommunity.com'
   this.steamId = '';
   this.identitySecret = '';
   this.deviceId = '';
@@ -28,7 +28,7 @@ class SteamCommunityMobileConfirmations {
 
     // Set each cookie NOM NOM
     for (let cookie of data.webCookie) {
-      this._requestJar.setCookie(request.cookie(cookie), 'https://steamcommunity.com');
+      this._requestJar.setCookie(request.cookie(cookie), this.STEAM_BASE);
     }
   }
 
@@ -38,9 +38,9 @@ class SteamCommunityMobileConfirmations {
    * @return {void}
    */
   fetchConfirmations(callback) {
-    this._request({
-      url:
-    }, (err, response, body) => {
+    let url = `${this.STEAM_BASE}/mobileconf/conf?${this._generateQueryString('conf')}`;
+
+    this.request(url, 'GET', (err, response, body) => {
       let error = checkResponse(err, response, body);
 
       if (error) {
@@ -57,7 +57,10 @@ class SteamCommunityMobileConfirmations {
       // Go through each confirmation, and generate a new Confirmation object
       $('[data-confid]').each((index, element) => {
         let $confirmation = $(element);
-        let description = $confirmation.find('.mobileconf_list_entry_description > div').map(() => $(this).text());
+        let description = $confirmation.find('.mobileconf_list_entry_description > div').map(function () {
+          return $(this).text();
+        });
+
         console.log(description);
 
         confirmations.push(new Confirmation({
