@@ -39,7 +39,7 @@ This sets up all final values, and should only be called **once**.
 
 Options:
 * `steamId` is a valid SteamID64
-* `identitySecret` is the secret key used for generating confirmation codes. (_not_ the once used for generating login codes)
+* `identitySecret` is the secret key used for generating confirmation codes. (_not_ the one used for generating login codes)
 * `webCookie` is the cookies we need for interacting with steam. Fetch them from the modules mentioned above.
 * `deviceId` (optional) is the device id used for all calls. Starts with `android:` - one will be generated if you do not provide one.
 * `steamOffset` (optional) is the time offset between you and steam. This is **highly recommended** to be provided, as _not_ providing it can cause avoidable errors. You can find this by running `getTimeOffset()` from the [node-steam-totp](https://github.com/DoctorMcKay/node-steam-totp) module. (Use the returned `offset` value)
