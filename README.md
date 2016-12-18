@@ -63,9 +63,15 @@ The second argument to `callback` will be a success boolean. (`true` for confirm
 ### getConfirmationTradeId(confirmation, callback)
 **You will likely not need to use this**, since the trade offer ID is already included in the [Confirmation](https://github.com/luop90/node-steam-mobile-confirmations/wiki/CConfirmation) object.
 
-  This will only fetch the confirmation information again, and then return the trade offer ID.
+This will only fetch the confirmation information again, and then return the trade offer ID.
 
-  The second argument to `callback` will be the tradeId, fetched from Valve.
+The second argument to `callback` will be the tradeId, fetched from Valve.
+
+## Events
+### 'needsNewSession'
+This is called when Steam returns a specific error, and your Steam Community session needs to be re-connected. Re-run [steam-weblogon](https://github.com/Alex7Kom/node-steam-weblogon), and then call `updateCookies()` with the new cookies.
+
+No calls will be made to Steam until you have called `updateCookies()`
 
 ## License
 MIT
