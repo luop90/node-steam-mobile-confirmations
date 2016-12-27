@@ -38,7 +38,7 @@ class SteamCommunityMobileConfirmations {
    * @return {void}
    */
   updateCookies(webCookie) {
-    for (let cookie of data.webCookie) {
+    for (let cookie of webCookie) {
       this._requestJar.setCookie(request.cookie(cookie), this.STEAM_BASE);
     }
 
