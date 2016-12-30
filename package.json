@@ -1,7 +1,7 @@
 {
   "name": "steam-mobile-confirmations",
   "description": "An updated trade-confirmation module for node-steam",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "author": "Luop90",
   "repository": {
     "type": "git",
