@@ -174,15 +174,7 @@ class SteamCommunityMobileConfirmations {
       headers: headers,
       form: form
     }, (error, response, body) => {
-      // If we have a 429 error, because volvo fucking hates us, wait for 3x the normal wait, and then try again.
-      if (response.statusCode == 429) {
-        this.has429Error = true;
-
-        setTimeout(() => {
-          this.request(url, method, form, callback);
-        }, this.timeBetweenCalls * 3);
-        return;
-      } else if (error && error.message == 'Invalid protocol: steammobile:') {
+      if (error) {
         console.error(error);
         console.error(response.statusCode);
         console.error(body);
@@ -193,6 +185,14 @@ class SteamCommunityMobileConfirmations {
         setTimeout(() => {
           this.request(url, method, form, callback);
         }, this.timeBetweenCalls);
+        return;
+      } else if (response.statusCode == 429) {
+        // If we have a 429 error, because volvo hates us, wait for 3x the normal wait, and then try again.
+        this.has429Error = true;
+
+        setTimeout(() => {
+          this.request(url, method, form, callback);
+        }, this.timeBetweenCalls * 3);
         return;
       }
 
